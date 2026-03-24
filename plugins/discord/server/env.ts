@@ -35,7 +35,7 @@ class DiscordPluginEnvironment extends Environment {
   @IsOptional()
   public DISCORD_BOT_TOKEN = this.toOptionalString(
     environment.DISCORD_BOT_TOKEN
-  )
+  );
 }
 
 export default new DiscordPluginEnvironment();

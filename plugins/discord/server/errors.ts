@@ -23,6 +23,6 @@ export function DiscordRoleSyncError(
 ) {
   return httpErrors(400, message, {
     id: "discord_role_sync_error",
-    isReportable: false
-  })
+    isReportable: false,
+  });
 }

@@ -27,9 +27,13 @@ import {
 } from "@server/utils/passport";
 import config from "../../plugin.json";
 import env from "../env";
-import { DiscordGuildError, DiscordGuildRoleError, DiscordRoleSyncError } from "../errors";
+import {
+  DiscordGuildError,
+  DiscordGuildRoleError,
+  DiscordRoleSyncError,
+} from "../errors";
 import { createContext } from "@server/context";
-import { Routes } from 'discord-api-types/v10';
+import { Routes } from "discord-api-types/v10";
 import { REST } from "@discordjs/rest";
 import { API as DiscordAPI } from "@discordjs/core";
 
@@ -73,10 +77,14 @@ if (env.DISCORD_CLIENT_ID && env.DISCORD_CLIENT_SECRET) {
         try {
           const team = await getTeamFromContext(context);
           const client = getClientFromOAuthState(context);
-          const userDiscordClient = new DiscordAPI(new REST({ version: '10', authPrefix: "Bearer" }).setToken(accessToken))
+          const userDiscordClient = new DiscordAPI(
+            new REST({ version: "10", authPrefix: "Bearer" }).setToken(
+              accessToken
+            )
+          );
 
           /** Fetch the user's profile */
-          const profile = await userDiscordClient.users.get("@me")
+          const profile = await userDiscordClient.users.get("@me");
 
           const email = profile.email;
           if (!email) {
@@ -108,7 +116,7 @@ if (env.DISCORD_CLIENT_ID && env.DISCORD_CLIENT_SECRET) {
            */
           if (env.DISCORD_SERVER_ID) {
             /** Fetch the guilds a user is in */
-            const guilds = await userDiscordClient.users.getGuilds()
+            const guilds = await userDiscordClient.users.getGuilds();
 
             /** Find the guild that matches the configured server ID */
             const guild = guilds?.find((g) => g.id === env.DISCORD_SERVER_ID);
@@ -145,8 +153,9 @@ if (env.DISCORD_CLIENT_ID && env.DISCORD_CLIENT_SECRET) {
             }
 
             /** Fetch the user's member object in the server for nickname and roles */
-            const guildMember =
-              await userDiscordClient.users.getGuildMember(env.DISCORD_SERVER_ID)
+            const guildMember = await userDiscordClient.users.getGuildMember(
+              env.DISCORD_SERVER_ID
+            );
 
             /** If the user has a nickname in the server, use that as the name */
             if (guildMember.nick) {

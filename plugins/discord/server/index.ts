@@ -6,7 +6,7 @@ import groupSyncProvider from "./auth/provider";
 
 const enabled = !!env.DISCORD_CLIENT_ID && !!env.DISCORD_CLIENT_SECRET;
 
-const groupSyncEnabled = !!env.DISCORD_SERVER_ID && !!env.DISCORD_BOT_TOKEN
+const groupSyncEnabled = !!env.DISCORD_SERVER_ID && !!env.DISCORD_BOT_TOKEN;
 
 if (enabled) {
   PluginManager.add({
@@ -19,6 +19,6 @@ if (enabled) {
 if (groupSyncEnabled) {
   PluginManager.add({
     type: Hook.GroupSyncProvider,
-    value: { provider: groupSyncProvider, id: config.id }
-  })
+    value: { provider: groupSyncProvider, id: config.id },
+  });
 }
