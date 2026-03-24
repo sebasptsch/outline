@@ -21,10 +21,7 @@ import {
 } from "@server/utils/passport";
 import config from "../../plugin.json";
 import env from "../env";
-import {
-  DiscordGuildError,
-  DiscordGuildRoleError,
-} from "../errors";
+import { DiscordGuildError, DiscordGuildRoleError } from "../errors";
 import { createContext } from "@server/context";
 import { Routes } from "discord-api-types/v10";
 import { REST } from "@discordjs/rest";
