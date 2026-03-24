@@ -31,7 +31,7 @@ class DiscordPluginEnvironment extends Environment {
     environment.DISCORD_SERVER_ROLES
   );
 
-  @CannotUseWithout("DISCORD_SERVER_ID")
+  @CannotUseWithout("DISCORD_BOT_TOKEN")
   @IsOptional()
   public DISCORD_BOT_TOKEN = this.toOptionalString(
     environment.DISCORD_BOT_TOKEN
