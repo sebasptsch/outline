@@ -1,10 +1,5 @@
 import passport from "@outlinewiki/koa-passport";
 import { isURL } from "class-validator";
-import type {
-  RESTGetAPICurrentUserGuildsResult,
-  RESTGetAPICurrentUserResult,
-  RESTGetCurrentUserGuildMemberResult,
-} from "discord-api-types/v10";
 import type { Context } from "koa";
 import Router from "koa-router";
 
@@ -16,21 +11,19 @@ import slugify from "@shared/utils/slugify";
 import accountProvisioner from "@server/commands/accountProvisioner";
 import { InvalidRequestError, TeamDomainRequiredError } from "@server/errors";
 import passportMiddleware from "@server/middlewares/passport";
-import { AuthenticationProvider, type User } from "@server/models";
+import type { User } from "@server/models";
 import type { AuthenticationResult } from "@server/types";
 import {
   StateStore,
   getTeamFromContext,
   getClientFromOAuthState,
   getUserFromOAuthState,
-  request,
 } from "@server/utils/passport";
 import config from "../../plugin.json";
 import env from "../env";
 import {
   DiscordGuildError,
   DiscordGuildRoleError,
-  DiscordRoleSyncError,
 } from "../errors";
 import { createContext } from "@server/context";
 import { Routes } from "discord-api-types/v10";

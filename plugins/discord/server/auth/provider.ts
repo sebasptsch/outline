@@ -11,7 +11,7 @@ import { REST } from "@discordjs/rest";
 class DiscordGroupSyncProvider implements GroupSyncProvider {
   async fetchUserGroups(
     accessToken: string,
-    settings: AuthenticationProviderSettings
+    _settings: AuthenticationProviderSettings
   ): Promise<ExternalGroupData[]> {
     if (!env.DISCORD_BOT_TOKEN || !env.DISCORD_SERVER_ID) {
       throw DiscordRoleSyncError("Discord role sync not configured correctly.");
