@@ -17,3 +17,12 @@ export function DiscordGuildRoleError(
     isReportable: false,
   });
 }
+
+export function DiscordRoleSyncError(
+  message = "User belongs to a guild that doesn't contain the Outline bot."
+) {
+  return httpErrors(400, message, {
+    id: "discord_role_sync_error",
+    isReportable: false
+  })
+}

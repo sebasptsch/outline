@@ -16,7 +16,7 @@ import slugify from "@shared/utils/slugify";
 import accountProvisioner from "@server/commands/accountProvisioner";
 import { InvalidRequestError, TeamDomainRequiredError } from "@server/errors";
 import passportMiddleware from "@server/middlewares/passport";
-import type { User } from "@server/models";
+import { AuthenticationProvider, type User } from "@server/models";
 import type { AuthenticationResult } from "@server/types";
 import {
   StateStore,
@@ -27,8 +27,11 @@ import {
 } from "@server/utils/passport";
 import config from "../../plugin.json";
 import env from "../env";
-import { DiscordGuildError, DiscordGuildRoleError } from "../errors";
+import { DiscordGuildError, DiscordGuildRoleError, DiscordRoleSyncError } from "../errors";
 import { createContext } from "@server/context";
+import { Routes } from 'discord-api-types/v10';
+import { REST } from "@discordjs/rest";
+import { API as DiscordAPI } from "@discordjs/core";
 
 const router = new Router();
 
@@ -51,8 +54,7 @@ if (env.DISCORD_CLIENT_ID && env.DISCORD_CLIENT_SECRET) {
         store: new StateStore(),
         state: true,
         callbackURL: `${env.URL}/auth/${config.id}.callback`,
-        authorizationURL:
-          "https://discord.com/api/oauth2/authorize?prompt=none",
+        authorizationURL: `${Routes.oauth2Authorization()}&prompt=none`,
         tokenURL: "https://discord.com/api/oauth2/token",
         pkce: false,
       },
@@ -71,12 +73,10 @@ if (env.DISCORD_CLIENT_ID && env.DISCORD_CLIENT_SECRET) {
         try {
           const team = await getTeamFromContext(context);
           const client = getClientFromOAuthState(context);
+          const userDiscordClient = new DiscordAPI(new REST({ version: '10', authPrefix: "Bearer" }).setToken(accessToken))
+
           /** Fetch the user's profile */
-          const profile: RESTGetAPICurrentUserResult = await request(
-            "GET",
-            "https://discord.com/api/users/@me",
-            accessToken
-          );
+          const profile = await userDiscordClient.users.get("@me")
 
           const email = profile.email;
           if (!email) {
@@ -98,7 +98,7 @@ if (env.DISCORD_CLIENT_ID && env.DISCORD_CLIENT_SECRET) {
           /** Default user and team names metadata */
           let userName = profile.username;
           let teamName;
-          let userAvatarUrl: string = `https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}.png`;
+          let userAvatarUrl = `https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}.png`;
           let teamAvatarUrl: string | undefined = undefined;
           let subdomain = slugifyDomain(domain);
 
@@ -108,11 +108,7 @@ if (env.DISCORD_CLIENT_ID && env.DISCORD_CLIENT_SECRET) {
            */
           if (env.DISCORD_SERVER_ID) {
             /** Fetch the guilds a user is in */
-            const guilds: RESTGetAPICurrentUserGuildsResult = await request(
-              "GET",
-              "https://discord.com/api/users/@me/guilds",
-              accessToken
-            );
+            const guilds = await userDiscordClient.users.getGuilds()
 
             /** Find the guild that matches the configured server ID */
             const guild = guilds?.find((g) => g.id === env.DISCORD_SERVER_ID);
@@ -149,12 +145,8 @@ if (env.DISCORD_CLIENT_ID && env.DISCORD_CLIENT_SECRET) {
             }
 
             /** Fetch the user's member object in the server for nickname and roles */
-            const guildMember: RESTGetCurrentUserGuildMemberResult =
-              await request(
-                "GET",
-                `https://discord.com/api/users/@me/guilds/${env.DISCORD_SERVER_ID}/member`,
-                accessToken
-              );
+            const guildMember =
+              await userDiscordClient.users.getGuildMember(env.DISCORD_SERVER_ID)
 
             /** If the user has a nickname in the server, use that as the name */
             if (guildMember.nick) {

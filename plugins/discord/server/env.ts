@@ -30,6 +30,12 @@ class DiscordPluginEnvironment extends Environment {
   public DISCORD_SERVER_ROLES = this.toOptionalCommaList(
     environment.DISCORD_SERVER_ROLES
   );
+
+  @CannotUseWithout("DISCORD_SERVER_ID")
+  @IsOptional()
+  public DISCORD_BOT_TOKEN = this.toOptionalString(
+    environment.DISCORD_BOT_TOKEN
+  )
 }
 
 export default new DiscordPluginEnvironment();
